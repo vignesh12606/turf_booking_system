@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Administrator Panel</h1>
+</div>
+
+<div class="admin-grid">
+    <!-- Manage Turfs Section -->
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Add New Turf</h2>
+            <form action="{{ url_for('add_turf') }}" method="POST" class="admin-form">
+                <div class="form-group">
+                    <label for="name">Turf Name</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" name="location" required>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="price">Price per Hour (₹)</label>
+                    <input type="number" name="price" step="0.01" required>
+                </div>
+                 <div class="form-group">
+                    <label for="image_url">Image URL</label>
+                    <input type="text" name="image_url">
+                </div>
+                <button type="submit" class="btn btn-primary">Add New Turf</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reports and Analytics Section -->
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Reports & Analytics</h2>
+            <p>Generate and download reports for analytics.</p>
+            <div class="report-buttons">
+                <a href="{{ url_for('download_pdf_report') }}" class="btn btn-secondary">Download PDF Report</a>
+                <a href="{{ url_for('download_excel_report') }}" class="btn btn-secondary">Export to Excel</a>
+            </div>
+            <hr>
+            <h3 class="card-subtitle">Manage Existing Turfs</h3>
+            <p class="small-text">Admins can remove turfs here. Manually managing individual time slots is an advanced feature that requires database changes.</p>
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>Turf Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for turf in turfs %}
+                    <tr>
+                        <td>{{ turf.name }}</td>
+                        <td>
+                            <form action="{{ url_for('remove_turf', turf_id=turf.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to permanently remove this turf and all its bookings?');">
+                                <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Recent Bookings Table -->
+    <div class="card full-width">
+        <div class="card-body">
+            <h2 class="card-title">Recent Bookings</h2>
+            <table class="styled-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Turf Name</th>
+                        <th>Booking Time</th>
+                        <th>Amount Paid</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.username }}</td>
+                        <td>{{ booking.name }}</td>
+                        <td>{{ booking.booking_time }}</td>
+                        <td>₹{{ "%.2f"|format(booking.amount_paid) }}</td>
+                        <td><span class="status-badge status-{{ booking.status.lower() }}">{{ booking.status }}</span></td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5">No recent bookings.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

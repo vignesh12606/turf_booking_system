@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}My Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>My Dashboard</h1>
+</div>
+
+<div class="dashboard-grid">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Loyalty Points</h2>
+            <p class="points-display">{{ g.user.loyalty_points }}</p>
+            <p>Earn 10 points for every completed booking. Redeem 50 points for a 25% discount!</p>
+        </div>
+    </div>
+    
+    <div class="card full-width">
+        <div class="card-body">
+            <h2 class="card-title">My Booking History</h2>
+            {% if bookings %}
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Turf Name</th>
+                            <th>Location</th>
+                            <th>Booking Time</th>
+                            <th>Status</th>
+                            <th>Amount Paid</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for booking in bookings %}
+                        <tr>
+                            <td>{{ booking.name }}</td>
+                            <td>{{ booking.location }}</td>
+                            <td>{{ booking.booking_time }}</td>
+                            <td><span class="status-badge status-{{ booking.status.lower() }}">{{ booking.status }}</span></td>
+                            <td>₹{{ "%.2f"|format(booking.amount_paid) }}</td>
+                            <td>
+                                {% if booking.status == 'Confirmed' %}
+                                <form action="{{ url_for('cancel_booking', booking_id=booking.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this booking?');">
+                                    <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+                                </form>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>You have no past bookings.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

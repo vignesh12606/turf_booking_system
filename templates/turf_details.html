@@ -1,0 +1,98 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ turf.name }}{% endblock %}
+
+{% block content %}
+<div class="details-container">
+    <div class="details-image">
+        <img src="{{ turf.image_url }}" alt="Image of {{ turf.name }}">
+    </div>
+    <div class="details-info">
+        <h1>{{ turf.name }}</h1>
+        <p class="location">{{ turf.location }}</p>
+        <p class="description">{{ turf.description }}</p>
+        <p class="price">Price: <strong>₹{{ "%.2f"|format(turf.price_per_hour) }}/hr</strong></p>
+        
+        <hr>
+
+        {# The fix is on this line: url_for('book') is now url_for('confirm_booking') #}
+        <form action="{{ url_for('confirm_booking') }}" method="POST" class="booking-form" id="bookingForm">
+            <input type="hidden" name="turf_id" value="{{ turf.id }}">
+            
+            <h2>Select a Slot</h2>
+            <div class="form-group">
+                <label for="date">Date</label>
+                <select name="date" id="date" required>
+                    {% for d in dates %}
+                        <option value="{{ d }}">{{ d }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Time</label>
+                <div class="time-slots-grid" id="time-slots">
+                    {% for t in time_slots %}
+                    <div class="time-slot-wrapper">
+                         <input type="radio" name="time" id="time-{{ t }}" value="{{ t }}" class="time-slot-radio" required>
+                         <label for="time-{{ t }}" class="time-slot-label">{{ t }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if g.user.loyalty_points >= 50 %}
+            <div class="form-group redeem-points">
+                <input type="checkbox" id="redeem_points" name="redeem_points">
+                <label for="redeem_points">
+                    Redeem 50 Points for a 25% Discount (Your balance: {{ g.user.loyalty_points }} points)
+                </label>
+            </div>
+            {% endif %}
+            
+            <button type="submit" class="btn btn-primary btn-block">Book Now</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dateSelector = document.getElementById('date');
+        const timeSlotsContainer = document.getElementById('time-slots');
+        const turfId = "{{ turf.id }}";
+
+        async function updateAvailability() {
+            const selectedDate = dateSelector.value;
+            const labels = timeSlotsContainer.querySelectorAll('.time-slot-label');
+
+            for (const label of labels) {
+                const radio = document.getElementById(label.getAttribute('for'));
+                const time = radio.value;
+                
+                const url = new URL('/check_availability', window.location.origin);
+                url.searchParams.append('turf_id', turfId);
+                url.searchParams.append('date', selectedDate);
+                url.searchParams.append('time', time);
+
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.available) {
+                    label.classList.remove('booked');
+                    radio.disabled = false;
+                } else {
+                    label.classList.add('booked');
+                    radio.disabled = true;
+                    radio.checked = false; 
+                }
+            }
+        }
+        
+        dateSelector.addEventListener('change', updateAvailability);
+        
+        // Initial check on page load
+        updateAvailability();
+    });
+</script>
+{% endblock %}
+

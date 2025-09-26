@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block title %}Available Turfs{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Find Your Pitch</h1>
+    <p>Browse and book from our premium selection of turfs.</p>
+</div>
+
+<div class="turf-grid">
+    {% for turf in turfs %}
+    <div class="card turf-card">
+        <img src="{{ turf.image_url }}" alt="Image of {{ turf.name }}" class="card-img-top">
+        <div class="card-body">
+            <h2 class="card-title">{{ turf.name }}</h2>
+            <p class="card-location">{{ turf.location }}</p>
+            <p class="card-text">{{ turf.description }}</p>
+            <div class="card-footer">
+                <span class="price-tag">₹{{ "%.2f"|format(turf.price_per_hour) }}/hr</span>
+                <a href="{{ url_for('turf_details', turf_id=turf.id) }}" class="btn btn-primary">Book Now</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <p>No turfs are available at the moment. Please check back later.</p>
+    {% endfor %}
+</div>
+{% endblock %}
+

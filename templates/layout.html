@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Turf Booker{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="{{ url_for('index') }}" class="nav-logo">Turf Ground Management System</a>
+            <ul class="nav-menu">
+                {% if g.user %}
+                    {% if g.user.is_admin %}
+                         <li><a href="{{ url_for('admin_dashboard') }}">Admin Panel</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('index') }}">Home</a></li>
+                        <li><a href="{{ url_for('dashboard') }}">My Bookings</a></li>
+                    {% endif %}
+                    <li class="nav-user">Welcome, {{ g.user.username }}!</li>
+                    {% if not g.user.is_admin %}
+                    <li class="nav-points">Points: {{ g.user.loyalty_points }}</li>
+                    {% endif %}
+                    <li><a href="{{ url_for('logout') }}" class="btn btn-outline">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}"> </a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer class="footer">
+        <p>&copy; 2025 Turf Ground Management System. All rights reserved.</p>
+    </footer>
+</body>
+</html>

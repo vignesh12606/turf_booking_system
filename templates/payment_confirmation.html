@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}Confirm Your Booking{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Confirm Your Payment</h1>
+    <p>Please review your booking details below before you confirm.</p>
+</div>
+
+<div class="card confirmation-card">
+    <div class="card-body">
+        <h2 class="card-title">Booking Summary</h2>
+        <table class="summary-table">
+            <tr>
+                <td>Turf:</td>
+                <td><strong>{{ turf.name }}</strong></td>
+            </tr>
+            <tr>
+                <td>Location:</td>
+                <td>{{ turf.location }}</td>
+            </tr>
+            <tr>
+                <td>Date:</td>
+                <td>{{ booking_details.date }}</td>
+            </tr>
+            <tr>
+                <td>Time:</td>
+                <td>{{ booking_details.time }}</td>
+            </tr>
+            <tr class="price-row">
+                <td>Price:</td>
+                <td>₹{{ "%.2f"|format(turf.price_per_hour) }}</td>
+            </tr>
+            {% if booking_details.discount > 0 %}
+            <tr class="discount-row">
+                <td>Loyalty Discount (25%):</td>
+                <td>- ₹{{ "%.2f"|format(booking_details.discount) }}</td>
+            </tr>
+            {% endif %}
+            <tr class="total-row">
+                <td>Total Amount:</td>
+                <td><strong>₹{{ "%.2f"|format(booking_details.final_amount) }}</strong></td>
+            </tr>
+        </table>
+
+        <form action="{{ url_for('execute_booking') }}" method="POST">
+            <input type="hidden" name="turf_id" value="{{ turf.id }}">
+            <input type="hidden" name="date" value="{{ booking_details.date }}">
+            <input type="hidden" name="time" value="{{ booking_details.time }}">
+            <input type="hidden" name="final_amount" value="{{ booking_details.final_amount }}">
+            <input type="hidden" name="points_redeemed" value="{{ booking_details.points_to_redeem }}">
+            
+            <div class="confirmation-actions">
+                <a href="{{ url_for('turf_details', turf_id=turf.id) }}" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Confirm & Pay</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

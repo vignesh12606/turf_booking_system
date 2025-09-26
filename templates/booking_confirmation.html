@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}Booking Confirmed{% endblock %}
+
+{% block content %}
+<div class="card confirmation-card">
+    <div class="card-body text-center">
+        <div class="success-icon">&#10004;</div>
+        <h1 class="card-title">Booking Successful!</h1>
+        <p>Your booking for <strong>{{ turf.name }}</strong> has been confirmed.</p>
+        <div class="booking-summary">
+            <p><strong>Date:</strong> {{ date }}</p>
+            <p><strong>Time:</strong> {{ time }}</p>
+            {% if discount > 0 %}
+                <p><strong>Original Price:</strong> <del>₹{{ "%.2f"|format(turf.price_per_hour) }}</del></p>
+                <p><strong>Discount Applied:</strong> - ₹{{ "%.2f"|format(discount) }}</p>
+            {% endif %}
+            <p><strong>Final Amount Paid:</strong> ₹{{ "%.2f"|format(amount) }}</p>
+        </div>
+        <p class="info-text">A confirmation has been sent to your registered email. Thank you for booking with TurfPro!</p>
+        <div class="confirmation-actions">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">View My Bookings</a>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Book Another Turf</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
